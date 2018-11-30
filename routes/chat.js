@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET register page. */
+/* GET chat page. */
 router.get('/', function(req, res, next) {
-  res.render('register', { title: '注册' });
+  res.render('chat', { title: '小乐机器人'});
 });
 
 module.exports = router;

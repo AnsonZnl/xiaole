@@ -23,7 +23,7 @@ router.post('/', function(req, res, next) {
    let user= util.isReg(loginUser, util.users);
    if(user !== null && user!== undefined){
      //用户存在
-    if(user.loginPwd === loginPwd){
+    if(user.loginPwd === loginUser.loginPwd){
       res.send("登陆成功，欢迎" + user.userName + ",<a href='/'> 返回主页</a>")
       res.redirect('/');
     }else{

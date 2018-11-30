@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/chat.css">
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.1.3/css/bootstrap.css" rel="stylesheet">
+    <title><%= title %></title>
+</head>
+<body>
+    <div class="panel panel-default">
+        <div class="panel-heading text-center">
+                <span class="glyphicon glyphicon-cloud" style="
+                font-size: 100px; color: #E9232C"></span>
+            <h2 class="text-danger" style="margin-top: 10px;"><%= title %>(简化版)</h2>
+        </div>
+        <div class="panel-body" style="position: relative;">
+            <ul id="chatList">
+                <li class="service"><span class="chat-msg">我想吃饭</span></li>
+                <li class="custom"><span class="chat-msg">吃什么饭, 赶紧敲代码去!</span></li>
+                <li class="service"><span class="chat-msg">我想吃饭</span></li>
+                <li class="custom"><span class="chat-msg">吃什么饭, 赶紧敲代码去!</span></li>
+                <li class="service"><span class="chat-msg">我想吃饭</span></li>
+                <li class="custom"><span class="chat-msg">吃什么饭, 赶紧敲代码去!</span></li>
+                <li class="service"><span class="chat-msg">我想吃饭</span></li>
+                <li class="custom"><span class="chat-msg">吃什么饭, 赶紧敲代码去!</span></li>
+                <li class="service"><span class="chat-msg">我想吃饭</span></li>
+                <li class="custom"><span class="chat-msg">吃什么饭, 赶紧敲代码去!</span></li>
+            </ul>
+        </div>
+        <div class="panel-footer">
+            <input type="text" id="msg" placeholder="请输入聊天内容">
+            <button id="btn_send" class="btn btn-primary">发送</button>
+            <button id="btn_close" class="btn btn-danger">关闭</button>
+        </div>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/socket.io/2.1.1/socket.io.js"></script>
+
+    <script>
+    //1. 建立连接
+    let url= 'http://localhost:3001';
+    let socket= io.connect(url);
+    //2. 监听
+    socket.on("connect", ()=>{
+        console.log('已经建立链接');
+        //2.1 打开通道
+        socket.emit('open');
+    });
+    //3. 接受服务器返回的消息
+    socket.on('msg', (data)=>{
+        // console.log(data);
+        deaWithMsg('service', data);
+    })
+
+    //添加用户发送的消息
+    $('#btn_send').on('click', ()=>{
+        addCustomMsg();
+    })
+
+    //按下回车发送消息
+    $(window).keydown(function(event){
+        if(event.keyCode === 13){
+            addCustomMsg();
+        }
+    })
+
+    //关闭聊天窗口
+    $('#btn_close').on('click', ()=>{
+        socket.disconnect(true);//关闭服务器连接
+        window.location.href= './';//返回主页
+    });
+
+     //处理服务端
+    let addCustomMsg= ()=>{
+        //1. 发送消息给服务器端
+        socket.emit('msg', $('#msg').val());
+        //2. 显示客户端的页面
+        deaWithMsg('custom', $('#msg').val());
+        //清空输入框
+        $('#msg').val('');
+    }
+
+    //处理客户端
+    let deaWithMsg= (className, data)=>{
+        //1. 创建一个li标签，把他插入到ul的最下边
+        let $liDom= $('<li>');
+        $liDom.attr({'class': className});
+        //1.1 创建span
+        let $spanDom= $('<span>');
+        $spanDom.attr({'class': 'chat-msg'});
+        $spanDom.text(data);
+        //1.2 把span放在li中
+        $liDom.append($spanDom);
+        //1.3 把li放在ul中
+        $('#chatList').append($liDom);
+
+        //2. 让滚动条一直停留在底部
+        let ulTop= $('#chatList')[0].scrollHeight;//获取ul的高度
+        $('#chatList').scrollTop(ulTop);//设置ul距离上面的高度
+    }
+    
+    
+    </script>
+</body>
+</html>
